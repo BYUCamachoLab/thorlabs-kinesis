@@ -104,10 +104,13 @@ CC_Open = bind(lib, "CC_Open", [POINTER(c_char)], c_short)
 CC_RequestPosition = bind(lib, "CC_RequestPosition", [POINTER(c_char)], c_short)
 CC_RequestSettings = bind(lib, "CC_RequestSettings", [POINTER(c_char)], c_short)
 CC_RequestStatusBits = bind(lib, "CC_RequestStatusBits", [POINTER(c_char)], c_short)
+CC_SetJogMode = bind(lib, "CC_SetJogMode", [POINTER(c_char), c_short, c_short], c_short)
 CC_SetJogStepSize = bind(lib, "CC_SetJogStepSize", [POINTER(c_char), c_uint], c_short)
 CC_SetVelParams = bind(lib, "CC_SetVelParams", [POINTER(c_char), c_int, c_int], c_short)
 CC_StartPolling = bind(lib, "CC_StartPolling", [POINTER(c_char), c_int], c_bool)
+CC_StopImmediate = bind(lib, "CC_StopImmediate", [POINTER(c_char)], c_short)
 CC_StopPolling = bind(lib, "CC_StopPolling", [POINTER(c_char)], None)
+CC_StopProfiled = bind(lib, "CC_StopProfiled",[POINTER(c_char)], c_short)
 CC_WaitForMessage = bind(lib, "CC_WaitForMessage", [POINTER(c_char),POINTER(c_word),POINTER(c_word),POINTER(c_dword)], None)
 
 

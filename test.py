@@ -1,6 +1,16 @@
+# equipment: Thorlabs Benchtop Piezo BCP 303 (3 channel piezo controller)
+#            connected to ThorLabs NanoMax 300 Stage (3 Channel)
+
+# Simply turn off unused devices then execute this file in the Anaconda Prompt
+
+# July 28, 2020
+# Davin Fish
+# P: 208 800 9565
+# email: davotrey@gmail.com
+
 import os
 os.environ['PATH'] = "C:\\Program Files\\ThorLabs\\Kinesis" + ";" + os.environ['PATH']
-#print(os.environ['PATH'])
+#print(os.environ['PATH']) 
 from threading import Thread
 import thorlabs_kinesis as tk
 import time

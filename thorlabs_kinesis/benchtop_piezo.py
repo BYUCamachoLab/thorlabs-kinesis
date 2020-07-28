@@ -43,9 +43,9 @@ CTR_OpenLoopSmoothed = c_int(3)
 CTR_ClosedLoopSmoothed = c_int(4)
 PZ_ControlModeTypes = c_int
 
-Channel1 = c_int(1)
-Channel2 = c_int(2)
-Channel3 = c_int(3)
+Channel1 = int(1)
+Channel2 = int(2)
+Channel3 = int(3)
 ChannelType = c_int
 
 

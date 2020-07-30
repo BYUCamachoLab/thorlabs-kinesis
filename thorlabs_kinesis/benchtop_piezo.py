@@ -2,6 +2,7 @@
 # Implemented with Kinesis Version 1.14.23.16838
 import thorlabs_kinesis as tk
 
+# import c types
 from ctypes import (
     Structure,
     cdll,
@@ -29,7 +30,7 @@ from thorlabs_kinesis._utils import (
 lib = cdll.LoadLibrary("Thorlabs.MotionControl.Benchtop.Piezo.dll")
 
 
-# enum MOT_MotorTypes
+# enum MOT_MotorTypes (c_int)
 MOT_NotMotor = c_int(0)
 MOT_DCMotor = c_int(1)
 MOT_StepperMotor = c_int(2)
@@ -37,11 +38,12 @@ MOT_BrushlessMotor = c_int(3)
 MOT_CustomMotor = c_int(100)
 MOT_MotorTypes = c_int
 
+# enum control types (c_int)
 CTR_OpenLoop = c_int(1)
 CTR_ClosedLoop = c_int(2)
 CTR_OpenLoopSmoothed = c_int(3)
 CTR_ClosedLoopSmoothed = c_int(4)
-PZ_ControlModeTypes = c_int
+PZ_ControlModeTypes = c_int # this is the variable the int will be saved to
 
 Channel1 = int(1)
 Channel2 = int(2)
@@ -87,14 +89,6 @@ TLI_GetDeviceListByTypeExt = bind(lib, "TLI_GetDeviceListByTypeExt", [POINTER(c_
 TLI_GetDeviceListByTypesExt = bind(lib, "TLI_GetDeviceListByTypesExt", [POINTER(c_char), c_dword, POINTER(c_int), c_int], c_short)
 TLI_GetDeviceInfo = bind(lib, "TLI_GetDeviceInfo", [POINTER(c_char), POINTER(TLI_DeviceInfo)], c_short)
 
-# CC_CanHome = bind(lib, "CC_CanHome", [POINTER(c_char)], c_bool)
-# CC_ClearMessageQueue = bind(lib, "CC_ClearMessageQueue", [POINTER(c_char)], None)
-# CC_GetJogVelParams = bind(lib, "CC_GetJogVelParams", [POINTER(c_char),POINTER(c_int),POINTER(c_int)], c_short)
-# CC_GetPosition  = bind(lib, "CC_GetPosition", [POINTER(c_char)], c_int)
-# CC_Home = bind(lib, "CC_Home", [POINTER(c_char)], c_short)
-# CC_MoveToPosition = bind(lib, "CC_MoveToPosition", [POINTER(c_char),c_int], c_short)
-
-
 
 # set the position control mode
 PBC_SetPositionControlMode = bind(lib, "PBC_SetPositionControlMode", [POINTER(c_char), c_short, PZ_ControlModeTypes], c_short)
@@ -114,7 +108,7 @@ PBC_EnableChannel = bind(lib, "PBC_EnableChannel", [POINTER(c_char), c_short], c
 PBC_DisableChannel = bind(lib, "PBC_DisableChannel", [POINTER(c_char), c_short], c_short)
 
 
-# gets position if in closed loop mode (undefined otherwise)
+# gets position if in closed loop mode (undefined otherwise), returns position as a percentage of max travel between -100 and 100 percent
 PBC_GetPosition = bind(lib, "PBC_GetPosition", [POINTER(c_char), c_short], c_short)
 # sets the position when in closed loop mode, returns an error code
 PBC_SetPosition = bind(lib, "PBC_SetPosition", [POINTER(c_char), c_short, c_short], c_short)
@@ -136,6 +130,3 @@ PBC_StartPolling = bind(lib, "PBC_StartPolling", [POINTER(c_char), c_short, c_in
 PBC_StopPolling = bind(lib, "PBC_StopPolling", [POINTER(c_char), c_short], None)
 # gets polling duration
 PBC_PollingDuration = bind(lib, "PBC_PollingDuration", [POINTER(c_char), c_short], c_long)
-
-# CC_WaitForMessage = bind(lib, "CC_WaitForMessage", [POINTER(c_char),POINTER(c_word),POINTER(c_word),POINTER(c_dword)], None)
-# CC_RequestPosition = bind(lib, "CC_RequestPosition", [POINTER(c_char)], None)

@@ -5,7 +5,6 @@
 
 # July 28, 2020
 # Davin Fish
-# P: 208 800 9565
 # email: davotrey@gmail.com
 
 import os

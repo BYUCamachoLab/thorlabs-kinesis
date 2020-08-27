@@ -110,7 +110,7 @@ if kcdc.TLI_BuildDeviceList() == 0:
     print("Number of positions:", pos)
 
     # Test CC_MoveJog
-    kcdc.CC_MoveJog(serialno, kcdc.MOT_TravelDirection.MOT_Reverse.value)
+    kcdc.CC_MoveJog(serialno, kcdc.MOT_Reverse)
     kcdc.is_moving(serialno)
 
     # Get position again.

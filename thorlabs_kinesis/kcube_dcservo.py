@@ -157,16 +157,16 @@ class MOT_HomingParameters(Structure):
                 ("offsetDistance", c_uint),
                 ("velocity", c_uint)]
 
+class MOT_VelocityParameters(Structure):
+    _fields_ = [("acceleration", c_int),
+                ("maxVelocity", c_int),
+                ("minVelocity", c_int)]
+
 class MOT_JogParameters(Structure):
     _fields_ = [("mode", MOT_JogModes),
                 ("stepSize", c_uint),
                 ("stopMode", MOT_StopModes),
                 ("velParams", MOT_VelocityParameters)]
-
-class MOT_VelocityParameters(Stucture):
-    _fields_ = [("acceleration", c_int),
-                ("maxVelocity", c_int),
-                ("minVelocity", c_int)]
 
 class MOT_DC_PIDParameters(Structure):
     _fields_ = [("differentialGain", c_int),
@@ -226,7 +226,7 @@ CC_GetLimitSwitchParamsBlock = bind(lib, "CC_GetLimitSwitchParamsBlock", [POINTE
 CC_GetMMIParams = not_implemented # bind(lib, "CC_GetMMIParams", [], )
 CC_GetMMIParamsBlock = not_implemented # bind(lib, "CC_GetMMIParamsBlock", [], )
 CC_GetMMIParamsExt = not_implemented # bind(lib, "CC_GetMMIParamsExt", [], )
-CC_GetMotorParams = bind(lib, "CC_GetMotorParams", [POINTER(c_char), POINTER(c_long), POITER(c_long), POINTER(c_float)], c_short)
+CC_GetMotorParams = bind(lib, "CC_GetMotorParams", [POINTER(c_char), POINTER(c_long), POINTER(c_long), POINTER(c_float)], c_short)
 CC_GetMotorParamsExt = bind(lib, "CC_GetMotorParamsExt", [POINTER(c_char), POINTER(c_double), POINTER(c_double), POINTER(c_double)], c_short)
 CC_GetMotorTravelLimits = bind(lib, "CC_GetMotorTravelLimits", [POINTER(c_char), POINTER(c_double), POINTER(c_double)], c_short)
 CC_GetMotorTravelMode = bind(lib, "CC_GetMotorTravelMode", [POINTER(c_char)], MOT_TravelModes)
@@ -289,7 +289,7 @@ CC_ResetRotationModes = bind(lib, "CC_ResetRotationModes", [POINTER(c_char)], c_
 CC_ResetStageToDefaults = bind(lib, "CC_ResetStageToDefaults", [POINTER(c_char)], c_short)
 CC_ResumeMoveMessages = bind(lib, "CC_ResumeMoveMessages", [POINTER(c_char)], c_short)
 CC_SetBacklash = bind(lib, "CC_SetBacklash", [POINTER(c_char), c_long], c_short)
-CC_SetDCPIDParams = bind(lib, "CC_SetDCPIDParams", [POINTER(c_char), pointer(MOT_DC_PIDParameters)], c_short)
+CC_SetDCPIDParams = bind(lib, "CC_SetDCPIDParams", [POINTER(c_char), POINTER(MOT_DC_PIDParameters)], c_short)
 CC_SetDigitalOutputs = bind(lib, "CC_SetDigitalOutputs", [POINTER(c_char), c_byte], c_short)
 CC_SetDirection = bind(lib, "CC_SetDirection", [POINTER(c_char), c_bool], None)
 CC_SetEncoderCounter = bind(lib, "CC_SetEncoderCounter", [POINTER(c_char), c_long], c_short)
@@ -312,7 +312,7 @@ CC_SetMotorParamsExt = bind(lib, "CC_SetMotorParamsExt", [POINTER(c_char), c_dou
 CC_SetMotorTravelLimits = bind(lib, "CC_SetMotorTravelLimits", [POINTER(c_char), c_double, c_double], c_short)
 CC_SetMotorTravelMode = bind(lib, "CC_SetMotorTravelMode", [POINTER(c_char), MOT_TravelModes], c_short)
 CC_SetMotorVelocityLimits = bind(lib, "CC_SetMotorVelocityLimits", [POINTER(c_char), c_double, c_double], c_short)
-CC_SetMoveAbsolutePosition = bind(lib, "CC_SetMoveAbsolutePosition", [POINTER(c_char), c_int], C_SHORT)
+CC_SetMoveAbsolutePosition = bind(lib, "CC_SetMoveAbsolutePosition", [POINTER(c_char), c_int], c_short)
 CC_SetMoveRelativeDistance = bind(lib, "CC_SetMoveRelativeDistance", [POINTER(c_char), c_int], c_short)
 CC_SetPositionCounter = bind(lib, "CC_SetPositionCounter", [POINTER(c_char), c_long], c_short)
 CC_SetRotationModes = bind(lib, "CC_SetRotationModes", [POINTER(c_char), MOT_MovementModes, MOT_MovementDirections], c_short)
@@ -330,17 +330,6 @@ CC_StopProfiled = bind(lib, "CC_StopProfiled",[POINTER(c_char)], c_short)
 CC_SuspendMoveMessages = bind(lib, "CC_SuspendMoveMessages", [POINTER(c_char)], c_short)
 CC_TimeSinceLastMsgReceived = not_implemented # bind(lib, "CC_TimeSinceLastMsgReceived", [POINTER(c_char)], )
 CC_WaitForMessage = bind(lib, "CC_WaitForMessage", [POINTER(c_char),POINTER(c_word),POINTER(c_word),POINTER(c_dword)], None)
-
-
-def is_moving(serialno):
-    CC_RequestStatusBits(serialno)
-    time.sleep(0.1)
-    bits = CC_GetStatusBits(serialno)
-    print(bits, type(bits))
-    print(bits & 0x00000010)
-    print(bits & 0x00000020)
-    print(bits & 0x00000040)
-    print(bits & 0x00000080)
 
 def not_implemented():
     raise NotImplementedError

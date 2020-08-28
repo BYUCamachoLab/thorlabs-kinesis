@@ -38,7 +38,8 @@ from ctypes import (
 from thorlabs_kinesis._utils import (
     c_word,
     c_dword,
-    bind
+    bind,
+    not_implemented,
 )
 
 lib = cdll.LoadLibrary("Thorlabs.MotionControl.KCube.DCServo.dll")
@@ -330,6 +331,3 @@ CC_StopProfiled = bind(lib, "CC_StopProfiled",[POINTER(c_char)], c_short)
 CC_SuspendMoveMessages = bind(lib, "CC_SuspendMoveMessages", [POINTER(c_char)], c_short)
 CC_TimeSinceLastMsgReceived = not_implemented # bind(lib, "CC_TimeSinceLastMsgReceived", [POINTER(c_char)], )
 CC_WaitForMessage = bind(lib, "CC_WaitForMessage", [POINTER(c_char),POINTER(c_word),POINTER(c_word),POINTER(c_dword)], None)
-
-def not_implemented():
-    raise NotImplementedError

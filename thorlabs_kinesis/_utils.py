@@ -39,6 +39,10 @@ def null_function():
     pass
 
 
+def not_implemented():
+    raise NotImplementedError
+
+
 __all__ = [
     "bind",
     "null_function",

@@ -174,7 +174,10 @@ if bp.TLI_BuildDeviceList() == 0:   # if there are devices properly built
     if size > 0:    # if at least one thor labs device is found
 
         # Open Communication
-        serialno = c_char_p(bytes("71854093", "utf-8")) # the 8 digit serial number on the back of the piezo controller
+        serialList = c_char_p(bytes("","utf-8"))
+        bp.TLI_GetDeviceListByTypeExt(serialList, 250, 71)  # get list of serial numbers of benchtop-piezo devices connected
+        print((serialList.value).decode("utf-8"))
+        serialno = c_char_p(serialList.value[ : -1]) # assumes there is only one device connected - the 8 digit serial number retrieved
         bp.PBC_Open(serialno)       # open the device for communication
         bp.PBC_StartPolling(serialno,bp.Channel1,c_int(200))    # start polling each channel every 200 ms
         bp.PBC_StartPolling(serialno,bp.Channel2,c_int(200))

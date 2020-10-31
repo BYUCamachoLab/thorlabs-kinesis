@@ -107,7 +107,7 @@ PBC_EnableChannel = bind(lib, "PBC_EnableChannel", [POINTER(c_char), c_short], c
 # disable channel so it can be moved by hand
 PBC_DisableChannel = bind(lib, "PBC_DisableChannel", [POINTER(c_char), c_short], c_short)
 
-
+#test comment commit
 # gets position if in closed loop mode (undefined otherwise), returns position as a percentage of max travel between -100 and 100 percent
 PBC_GetPosition = bind(lib, "PBC_GetPosition", [POINTER(c_char), c_short], c_short)
 # sets the position when in closed loop mode, returns an error code

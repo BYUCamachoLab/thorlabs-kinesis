@@ -116,6 +116,10 @@ PBC_SetPosition = bind(lib, "PBC_SetPosition", [POINTER(c_char), c_short, c_shor
 PBC_Identify = bind(lib, "PBC_Identify", [POINTER(c_char), c_short], None)
 # verifies that the specified channel is valid
 PBC_IsChannelValid = bind(lib, "PBC_IsChannelValid", [POINTER(c_char), c_short], c_bool)
+# returns the maximum travel in 100nm units (1 is 100 nm and 200 is 20000 nm or 20um)
+PBC_GetMaxTravel = bind(lib, "PBC_GetMaximumTravel", [POINTER(c_char),  c_short], c_short)
+# returns the maximum voltage output in V/10 (750 is 75 volts)
+PBC_GetMaxVoltage = bind(lib, "PBC_GetMaxOutputVoltage", [POINTER(c_char), c_short], c_short)
 
 # resets all parameters to power-up values
 PBC_ResetParameters = bind(lib, "PBC_ResetParameters", [POINTER(c_char), c_short], c_short)

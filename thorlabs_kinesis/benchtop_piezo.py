@@ -75,6 +75,10 @@ class TLI_HardwareInformation(Structure):
                 ("modificationState", c_word),
                 ("numChannels", c_short)]
 
+class PZ_FeedbackLoopConstants(Structure):
+    _fields_ = [("integralTerm", c_short),
+                ("proportionalTerm", c_short)]
+
 PBC_CheckConnection = bind(lib, "PBC_CheckConnection", )
 
 
@@ -89,9 +93,25 @@ TLI_GetDeviceListByTypeExt = bind(lib, "TLI_GetDeviceListByTypeExt", [POINTER(c_
 TLI_GetDeviceListByTypesExt = bind(lib, "TLI_GetDeviceListByTypesExt", [POINTER(c_char), c_dword, POINTER(c_int), c_int], c_short)
 TLI_GetDeviceInfo = bind(lib, "TLI_GetDeviceInfo", [POINTER(c_char), POINTER(TLI_DeviceInfo)], c_short)
 
-
+# returns true if the USB is listed by the ftdi controller
+PBC_CheckConnection = bind(lib, "PBC_CheckConnection", [POINTER(c_char)], c_bool)
+# enables the last message monitoring timer
+PBC_EnableLastMsgTimer = bind(lib, "PBC_EnableLastMsgTimer", [POINTER(c_char), c_short, c_bool, c_int32], None)
 # set the position control mode
 PBC_SetPositionControlMode = bind(lib, "PBC_SetPositionControlMode", [POINTER(c_char), c_short, PZ_ControlModeTypes], c_short)
+# gets the feedback loop parameters
+PBC_GetFeedbackLoopPIconsts = bind(lib, "PBC_GetFeedbackLoopPIconsts", [POINTER(c_char), c_short, POINTER(c_short), POINTER(c_short)], c_short)
+# gets the feedback loop constants in a block
+PBC_GetFeedbackLoopPIconstsBlock = bind(lib, "PBC_GetFeedbackLoopPIconstsBlock", [POINTER(c_char), c_short, POINTER(PZ_FeedbackLoopConstants)], c_short)
+# gets version number of the device firmware
+PBC_GetFirmwareVersion = bind(lib, "PBC_GetFirmwareVersion", [POINTER(c_char)], c_dword)
+# gets the hardware information from the device
+PBC_GetHardwareInfo = bind(lib, "PBC_GetHardwareInfo", [POINTER(c_char), c_short, POINTER(c_char), c_dword, POINTER(c_word), POINTER(c_word), POINTER(c_char), c_dword, POINTER(c_dword), POINTER(c_word), POINTER(c_word)], c_short)
+# gets the hardware information in a block
+PBC_GetHardwareInfoBlock = bind(lib, "PBC_GetHardwareInfoBlock", [POINTER(c_char), c_short, TLI_HardwareInformation], c_short)
+#
+
+
 # get position control mode
 PBC_GetPositionControlMode = bind(lib, "PBC_GetPositionControlMode", [POINTER(c_char), c_short], PZ_ControlModeTypes)
 # requests position control mode be read from the device for the device and channel
@@ -125,7 +145,9 @@ PBC_ResetParameters = bind(lib, "PBC_ResetParameters", [POINTER(c_char), c_short
 # sets the voltage output to zero and defines the ensuing actuator position as zero
 PBC_SetZero = bind(lib, "PBC_SetZero", [POINTER(c_char), c_short], c_short)
 # clears the device message queue
-PBC_ClearMessageQueue = bind(lib, "PBC_ClearMessageQueue")
+PBC_ClearMessageQueue = bind(lib, "PBC_ClearMessageQueue", [POINTER(c_char)], c_short)
+# gets the next message in the queue
+PBC_GetNextMessage = bind(lib, "PBC_GetNextMessage", [POINTER(c_char), c_short, POINTER(c_word), POINTER(c_word), POINTER(c_dword)], c_bool)
 
 # starts internal polling loop which continuously requests position and status
 PBC_StartPolling = bind(lib, "PBC_StartPolling", [POINTER(c_char), c_short, c_int], c_bool)

@@ -169,6 +169,13 @@ def adjust(channel):
 maxTravel = 32767 # travel is from 0 to 32767 for 20 um
 if bp.TLI_BuildDeviceList() == 0:   # if there are devices properly built
     print("Device list built (no errors).")
+    serialList = c_char_p(bytes("","utf-8"))
+    print(serialList)
+    bp.TLI_GetDeviceListByTypeExt(serialList, 250, 71)  # get list of serial numbers of benchtop-piezo devices connected
+    print(int((serialList.value[0:8]).decode("utf-8")))
+    g = ((serialList.value[10:19]).decode("utf-8")=="")
+    print(g)
+    serialno = c_char_p(serialList.value[ : -1]) # assume there is only one device connected - the 8 digit serial number retrieved
     size = bp.TLI_GetDeviceListSize()   # finds the amount of devices seen
     print(size, "device(s) found.")
     if size > 0:    # if at least one thor labs device is found

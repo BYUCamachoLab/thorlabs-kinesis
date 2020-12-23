@@ -1,3 +1,12 @@
+# equipment: Thorlabs Benchtop Piezo BCP 303 (3 channel piezo controller)
+#            connected to ThorLabs NanoMax 300 Stage (3 Channel)
+
+# Simply turn off unused devices then execute this file in the Anaconda Prompt
+
+# July 28, 2020
+# Davin Fish
+# email: davotrey@gmail.com
+
 import os
 os.environ['PATH'] = "C:\\Program Files\\ThorLabs\\Kinesis" + ";" + os.environ['PATH']
 #print(os.environ['PATH'])
@@ -28,29 +37,31 @@ def flush_input():
     except ImportError:
         import sys, termios
         termios.tcflush(sys.stdin, termios.TCIOFLUSH)
-
+# to prevent multiple prints/actions per key press
 def keyDebounce():
-    time.sleep(0.2) # sleep 200 ms to prevent multiple prints/actions per key press
+    time.sleep(0.2) # sleep 200 ms 
 
+# Home the stages at half-of-travel so they can be used to do slight adjustments
 def homeStages():
-    # Home the y and z directions at half-of-travel so they can be used to do slight adjustments
-    halfway = c_short(16383)
-    quarter = c_short(8191)
-    bp.PBC_SetPosition(serialno,bp.Channel1,halfway)
+    halfway = c_short(16383)    # half of travel 
+    bp.PBC_SetPosition(serialno,bp.Channel1,halfway)    # set the position
     bp.PBC_SetPosition(serialno,bp.Channel2,halfway)
     bp.PBC_SetPosition(serialno,bp.Channel3,halfway)
-    print("Stages Homing, waiting 5 sec to settle...")
-    time.sleep(5)
+    print("Stages Homing, waiting 3 sec to settle...")  # in the case of zeroing, there may be some settle-time
+    time.sleep(3)
     print("done")
 
+# increase the position of a provided channel by a certain joglength
 def upShift(jogLength,channel):
     currentPos = int(bp.PBC_GetPosition(serialno,channel))
     bp.PBC_SetPosition(serialno,channel,c_short(currentPos + jogLength))
 
+# decrease the position of a provided channel by a certain joglength
 def downShift(jogLength,channel):
     currentPos = int(bp.PBC_GetPosition(serialno,channel))
     bp.PBC_SetPosition(serialno,channel,c_short(currentPos - jogLength))
 
+# allows for more direct control of the x channel movement
 def move():
     print("Press 'w' to shift 10 nm forward\nPress 's' to shift 80 nm backward\nPress 'e' to shift 5 nm forward\nPress 'd' to shift 5nm backward\nPress 'q' to exit function")
     Done = False
@@ -59,6 +70,7 @@ def move():
     small = int(8)          # 5 nm
     extraLarge = int(200)   # 125 nm
 
+    # look for key presses, q reverts to main menu
     while not Done:
         try:
             if keyboard.is_pressed('q'):
@@ -86,6 +98,10 @@ def move():
         except:
             continue
 
+# for coupling a resonator to a stationary tapered fiber
+# draws the resonator closer (x channel/axis) at a variable rate
+# stopping the movement draws back and enters the move state
+# for more fine control of the coupling, good for coupling at a gap
 def couple():
     print("Press 'w' to increase jog step forward (accelerate)\nPress 's' to decrease jog step forward (decelerate)\nPress 'q' to exit function\n\nStarted Motion towards Fiber...")
     jogLength = int(16) # just under 10 nm of travel
@@ -119,6 +135,7 @@ def couple():
         printCounter += 1 
         time.sleep(0.2)
 
+# allows for rough adjustment of the y and z channels
 def adjust(channel):
     print("Press 'w' to shift 0.5 um up or right\nPress 's' to shift 0.5 um down or left\nPress 'q' to exit function")
     jogLength = 800 # about half a micron out of 20 um of 
@@ -149,14 +166,24 @@ def adjust(channel):
 
 
 maxTravel = 32767 # travel is from 0 to 32767 for 20 um
-if bp.TLI_BuildDeviceList() == 0:
+if bp.TLI_BuildDeviceList() == 0:   # if there are devices properly built
     print("Device list built (no errors).")
-    size = bp.TLI_GetDeviceListSize()
+    serialList = c_char_p(bytes("","utf-8"))
+    print(serialList)
+    bp.TLI_GetDeviceListByTypeExt(serialList, 250, 71)  # get list of serial numbers of benchtop-piezo devices connected
+    print(int((serialList.value[0:8]).decode("utf-8")))
+    g = ((serialList.value[10:19]).decode("utf-8")=="")
+    print(g)
+    serialno = c_char_p(serialList.value[ : -1]) # assume there is only one device connected - the 8 digit serial number retrieved
+    size = bp.TLI_GetDeviceListSize()   # finds the amount of devices seen
     print(size, "device(s) found.")
     if size > 0:    # if at least one thor labs device is found
 
         # Open Communication
-        serialno = c_char_p(bytes("71854093", "utf-8")) # the 8 digit serial number on the back of the piezo controller
+        serialList = c_char_p(bytes("","utf-8"))
+        bp.TLI_GetDeviceListByTypeExt(serialList, 250, 71)  # get list of serial numbers of benchtop-piezo devices connected
+        print((serialList.value).decode("utf-8"))
+        serialno = c_char_p(serialList.value[ : -1]) # assumes there is only one device connected - the 8 digit serial number retrieved
         bp.PBC_Open(serialno)       # open the device for communication
         bp.PBC_StartPolling(serialno,bp.Channel1,c_int(200))    # start polling each channel every 200 ms
         bp.PBC_StartPolling(serialno,bp.Channel2,c_int(200))
@@ -168,21 +195,29 @@ if bp.TLI_BuildDeviceList() == 0:
 
         # x axis
         bp.PBC_EnableChannel(serialno, bp.Channel1) # enables control of specified channel
-        bp.PBC_SetPositionControlMode(serialno, bp.Channel1, bp.CTR_ClosedLoop) # set the channel to closed loop
-        bp.PBC_Identify(serialno, bp.Channel1)  # cause the LED readout to blink to identify it
+        bp.PBC_SetZero(serialno, bp.Channel1)   # set the voltage to 0, then define that position as 0
+        #bp.PBC_Identify(serialno, bp.Channel1)  # cause the LED readout to blink to identify it
+        print("zeroing channel 1")
+
         # y axis
         bp.PBC_EnableChannel(serialno, bp.Channel2)
-        bp.PBC_SetPositionControlMode(serialno, bp.Channel2, bp.CTR_ClosedLoop)
+        bp.PBC_SetZero(serialno, bp.Channel2)   # set the voltage to 0, then define that position as 0
         # bp.PBC_Identify(serialno, bp.Channel2)
+        print("zeroing channel 2")
+
         # z axis
         bp.PBC_EnableChannel(serialno, bp.Channel3)
-        bp.PBC_SetPositionControlMode(serialno, bp.Channel3, bp.CTR_ClosedLoop)
+        bp.PBC_SetZero(serialno, bp.Channel3)   # set the voltage to 0, then define that position as 0
         # bp.PBC_Identify(serialno, bp.Channel3)
+        print("zeroing channel 3")
+        time.sleep(40)
 
-        #Identify Control Mode TODO: remove this code after testing
-        print("control type for bp.Channel3: ", bp.PBC_GetPositionControlMode(serialno,bp.Channel1))
+        #Identify Control Mode TODO: remove this code after testing 
+        print("control type for bp.Channel1: ", bp.PBC_GetPositionControlMode(serialno,bp.Channel1))
         print("control type for bp.Channel2: ", bp.PBC_GetPositionControlMode(serialno,bp.Channel2))
         print("control type for bp.Channel3: ", bp.PBC_GetPositionControlMode(serialno,bp.Channel3))
+
+        homeStages()
 
         Done = False
         while not Done:
@@ -198,7 +233,7 @@ if bp.TLI_BuildDeviceList() == 0:
             elif command is 'y':
                 adjust(bp.Channel2)
             elif command is '?':
-                print('\nh -------- home the three axis\nc -------- couple (q to quit, w to speed up, s to slow down\nm -------- move x axis at different step sizes\nz -------- adjust z axis (q to quit, w to move up, s to move down\ny -------- adjust y axis (q to quit, w to move up, s to move down\nq -------- quit')
+                print('\nh -------- home the three axis\nc -------- couple (q to quit, w to speed up, s to slow down)\nm -------- move x axis at different step sizes\nz -------- adjust z axis (q to quit, w to move up, s to move down)\ny -------- adjust y axis (q to quit, w to move up, s to move down)\nq -------- quit')
             elif command is 'q':
                 Done = True
 
@@ -207,6 +242,6 @@ if bp.TLI_BuildDeviceList() == 0:
         bp.PBC_StopPolling(serialno,bp.Channel2)
         bp.PBC_StopPolling(serialno,bp.Channel3)
         if bp.PBC_Disconnect(serialno) == 0:
-                print("device disconnected")
+            print("device disconnected")
         bp.PBC_Close(serialno)
         flush_input()

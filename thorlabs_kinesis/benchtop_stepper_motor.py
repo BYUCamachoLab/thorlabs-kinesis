@@ -1,4 +1,16 @@
-"Bindings for Thorlabs Benchtop Stepper Motor DLL"
+# -*- coding: utf-8 -*-
+#
+# Copyright © Thorlabs-Kinesis Project Contributors
+# Licensed under the terms of the GNU GPLv3+ License
+# (see thorlabs_kinesis/__init__.py for details)
+
+"""
+Benchtop Stepper Motor
+----------------------
+
+Bindings for Thorlabs Benchtop Stepper Motor DLL.
+"""
+
 # flake8: noqa
 from ctypes import (
     Structure,

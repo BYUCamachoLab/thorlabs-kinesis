@@ -12,9 +12,6 @@ Bindings for Thorlabs KCube DC Servo DLL.
 Implemented with Kinesis Version 1.14.23.16838
 """
 
-import enum
-import time
-
 import thorlabs_kinesis as tk
 
 from ctypes import (
@@ -24,7 +21,6 @@ from ctypes import (
     c_short,
     c_int,
     c_uint,
-    c_int16,
     c_int32,
     c_char,
     c_byte,
@@ -32,7 +28,6 @@ from ctypes import (
     c_float,
     c_double,
     POINTER,
-    CFUNCTYPE,
 )
 
 from thorlabs_kinesis._utils import (
